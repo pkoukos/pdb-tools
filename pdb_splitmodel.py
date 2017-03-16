@@ -59,6 +59,7 @@ def _extract_models(fhandle):
             output_handle.write(line)
         elif line.startswith('MODEL'):
             model_no = line.split()[-1]
+            model_no = '{0:03d}'.format(int(model_no))
             output_handle = open(fname_root + '_' + model_no + '.pdb', 'w')
         elif line.startswith('ENDMDL'):
             output_handle.write('END\n')
