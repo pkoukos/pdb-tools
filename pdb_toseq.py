@@ -70,6 +70,10 @@ def _get_sequence(fhandle):
     fhandle = fhandle
     sequence = {}
     read = set()
+
+    gap_report_fhandle = open('gap.txt', 'w')
+
+    chain_and_resi = []
     for line in fhandle:
         line = line.strip()
         if line[0:6] in _records:
@@ -88,7 +92,20 @@ def _get_sequence(fhandle):
             if chain not in sequence:
                 sequence[chain] = []
 
+            chain_and_resi.append([chain, resi])
+            if len(chain_and_resi) > 1:
+                if chain_and_resi[-1][0] == chain_and_resi[-2][0]:
+                    if int(chain_and_resi[-1][1]) != int(chain_and_resi[-2][1]) + 1:
+                        gaps = int(chain_and_resi[-1][1]) - int(chain_and_resi[-2][1]) - 1
+                        for gap in range(gaps):
+                            sequence[chain].append('-')
+                            # pass
+
+                        if line[0:4] == 'ATOM':
+                            gap_report_fhandle.write(chain + ' ' + str(int(chain_and_resi[-2][1]) + 1) + ' ' + str(gaps) + '\n')
             sequence[chain].append(aa_resn)
+
+    gap_report_fhandle.close()
 
     return sequence
 
