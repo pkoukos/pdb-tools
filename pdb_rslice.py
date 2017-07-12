@@ -83,9 +83,18 @@ def _slice_pdb(fhandle, rslice):
 
     prev_resi = None
     for line in fhandle:
-        if line.startswith(('ATOM', 'HETATM', 'TER')):
+        if line.startswith(('ATOM', 'HETATM')):
             if st_slice <= int(line[22:26]) <= en_slice:
                 yield line
+        elif line.startswith('TER'):
+            if len(line) >= 26:
+                if st_slice <= int(line[22:26]) <= en_slice:
+                    yield line
+            elif prev_resi and st_slice <= prev_resi <= en_slice:
+                yield line
+
+        if line.startswith(('ATOM', 'HETATM', 'TER')) and len(line) >= 26:
+            prev_resi = int(line[22:26])
 
 if __name__ == '__main__':
 
