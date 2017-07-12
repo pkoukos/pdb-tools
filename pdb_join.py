@@ -61,6 +61,9 @@ def _join_pdb(pdb_list):
         with open(pdb_f, 'r') as handle:
             for line in handle:
                 line = line.strip('\n')
+                if line.startswith('TER'):
+                    pdb_data.append('TER')
+                    continue
                 if coord_re.match(line):
                     pdb_data.append(line)
                     model_auids.add(auid(line))
