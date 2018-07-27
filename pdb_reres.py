@@ -86,8 +86,6 @@ def _renumber_pdb_residue(fhandle, sresid):
                 # Insertion code
                 i_code = line[22:27]
                 if i_code not in inserted_residues:
-                    # inserted_residues[i_code] = len(inserted_residues) + 1
-                    # resi += inserted_residues[i_code]
                     inserted_residues[i_code] = True
                     resi += 1
             yield line[:22] + str(resi).rjust(4) + " " + line[27:]
