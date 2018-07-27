@@ -74,13 +74,23 @@ def _renumber_pdb_residue(fhandle, sresid):
 
     resi = sresid - 1
     prev_resi = None
+
+    inserted_residues = {}
+
     for line in fhandle:
         if line.startswith(('ATOM', 'HETATM', 'TER')):
-            if line[22:26] != prev_resi:
-                prev_resi = line[22:26]
+            if line[22:27] != prev_resi and line[26] == " ":
+                prev_resi = line[22:27]
                 resi += 1
-
-            yield line[:22] + str(resi).rjust(4) + line[26:]
+            elif line[22:27] != prev_resi and line[26] != " ":
+                # Insertion code
+                i_code = line[22:27]
+                if i_code not in inserted_residues:
+                    # inserted_residues[i_code] = len(inserted_residues) + 1
+                    # resi += inserted_residues[i_code]
+                    inserted_residues[i_code] = True
+                    resi += 1
+            yield line[:22] + str(resi).rjust(4) + " " + line[27:]
         else:
             yield line
 
