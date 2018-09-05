@@ -72,10 +72,23 @@ def check_input(args):
 def _shift_pdb_residue(fhandle, sresid):
     """Enclosing logic in a function to speed up a bit"""
 
+    resi = 0
+    prev_resi = None
+
+    inserted_residues = {}
+
     for line in fhandle:
         if line.startswith(('ATOM', 'HETATM', 'TER')):
-            resi = int(line[22:26]) + sresid
-            yield line[:22] + str(resi).rjust(4) + line[26:]
+            if line[22:27] != prev_resi and line[26] == " ":
+                prev_resi = line[22:27]
+                resi = int(line[22:26]) + sresid + len(inserted_residues)
+            elif line[22:27] != prev_resi and line[26] != " ":
+                # Insertion code
+                i_code = line[22:27]
+                if i_code not in inserted_residues:
+                    inserted_residues[i_code] = True
+                    resi += 1
+            yield line[:22] + str(resi).rjust(4) + " " + line[27:]
         else:
             yield line
 
